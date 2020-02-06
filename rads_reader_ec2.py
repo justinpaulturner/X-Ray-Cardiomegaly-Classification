@@ -1,5 +1,6 @@
 #Justin Turner
 #Class for handing the chest X-ray data
+#Designed to access data that is stored locally on the ec2 machine
 import numpy as np
 import pandas as pd
 import boto3
@@ -37,52 +38,32 @@ class Rads_Reader:
         
     def SampleTrainingArray(self, n_images=20, IMG_SIZE=100):
         training_data = []
-        s3 = boto3.resource('s3')
-        bucket = s3.Bucket('rads-reader')
         for img_name in self.ClassificationDf()['Image Index'][:n_images]:
-            object = bucket.Object('data/images/'+img_name)
-            tmp = tempfile.NamedTemporaryFile()
             class_num = self.IndexedDf().loc[img_name]['cardiomegaly']
-            with open(tmp.name, 'wb') as f:
-                object.download_fileobj(f)
-                img_array=cv2.imread(tmp.name) #creating image array
-                new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
-                avg_array = []
-                for num in new_array:
-                    for nums in num:
-                        avg_array.append(np.mean(nums))
-                training_data.append([img_name, avg_array, class_num])
+            img_array=cv2.imread('images/'+img_name) #creating image array
+            new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
+            avg_array = []
+            for num in new_array:
+                for nums in num:
+                    avg_array.append(np.mean(nums))
+            training_data.append([img_name, avg_array, class_num])
         return training_data
     
     def TrainingArray(self, IMG_SIZE=100):
         training_data = []
-        s3 = boto3.resource('s3')
-        bucket = s3.Bucket('rads-reader')
         for img_name in self.ClassificationDf()['Image Index']:
-            object = bucket.Object('data/images/'+img_name)
-            tmp = tempfile.NamedTemporaryFile()
             class_num = self.IndexedDf().loc[img_name]['cardiomegaly']
-            with open(tmp.name, 'wb') as f:
-                object.download_fileobj(f)
-                img_array=cv2.imread(tmp.name) #creating image array
-                new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
-                avg_array = []
-                for num in new_array:
-                    for nums in num:
-                        avg_array.append(np.mean(nums))
-                training_data.append([img_name, avg_array, class_num])
+            img_array=cv2.imread('images/'+img_name) #creating image array
+            new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
+            avg_array = []
+            for num in new_array:
+                for nums in num:
+                    avg_array.append(np.mean(nums))
+            training_data.append([img_name, avg_array, class_num])
         return training_data
 
     def PlotImage(self, img_name='00000001_000.png'):
-        s3 = boto3.resource('s3')
-        bucket = s3.Bucket('rads-reader')
-        object = bucket.Object(f'data/images/{img_name}')
-        tmp = tempfile.NamedTemporaryFile()
-
-        with open(tmp.name, 'wb') as f:
-            object.download_fileobj(f)
-
-            img_array=cv2.imread(tmp.name)
+            img_array=cv2.imread('images/'+img_name)
             plt.imshow(img_array,cmap="gray")
             plt.show()
     
