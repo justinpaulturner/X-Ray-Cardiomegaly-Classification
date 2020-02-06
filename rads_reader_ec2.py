@@ -1,6 +1,7 @@
 #Justin Turner
 #Class for handing the chest X-ray data
 #Designed to access data that is stored locally on the ec2 machine
+#Note to self, run this command to sync the remaining 60k files to /images: aws s3 sync s3://rads-reader-images/all_images /home/ec2-user/SageMaker/radsreader/images
 import numpy as np
 import pandas as pd
 import boto3
