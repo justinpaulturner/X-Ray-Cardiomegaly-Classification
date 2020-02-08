@@ -32,6 +32,15 @@ class Rads_Reader:
         ### Create condensed version of dataframe ###
         df = categorical_df[['Image Index','Finding Labels','cardiomegaly']]
         return df
+
+    def HalfCardiomegalyDf(self):
+        df = self.ClassificationDf()
+        nofinding_df = df[df['Finding Labels'] == 'No Finding']
+        nofinding_df_1k = nofinding_df.iloc[:1093]
+        cardiomegaly_df = df[df['Finding Labels'] == 'Cardiomegaly']
+        half_cardiomegaly_df = pd.concat([nofinding_df_1k, cardiomegaly_df])
+        half_cardiomegaly_df = half_cardiomegaly_df.sample(frac=1)
+        return half_cardiomegaly_df
         
     def IndexedDf(self):
         indexed_w_all = self.ClassificationDf().set_index('Image Index')
@@ -53,6 +62,19 @@ class Rads_Reader:
     def TrainingArray(self, IMG_SIZE=100):
         training_data = []
         for img_name in self.ClassificationDf()['Image Index']:
+            class_num = self.IndexedDf().loc[img_name]['cardiomegaly']
+            img_array=cv2.imread('images/'+img_name) #creating image array
+            new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
+            avg_array = []
+            for num in new_array:
+                for nums in num:
+                    avg_array.append(np.mean(nums))
+            training_data.append([img_name, avg_array, class_num])
+        return training_data
+    
+    def CardiomegalyTrainingArray(self, IMG_SIZE=100):
+        training_data = []
+        for img_name in self.HalfCardiomegalyDf()['Image Index']:
             class_num = self.IndexedDf().loc[img_name]['cardiomegaly']
             img_array=cv2.imread('images/'+img_name) #creating image array
             new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
@@ -97,6 +119,8 @@ class Rads_Reader:
         X = self.TrainingDf().drop(['img_name', 'class_num'], axis = 1)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=69)
         return X_train, X_test, y_train, y_test
+    
+
     
     
     
