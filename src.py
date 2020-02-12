@@ -30,41 +30,140 @@ class Rads_Reader:
                'Pleural_Thickening', 'Fibrosis']]
         return df
 
-    def HalfConditionDf(self, condition = 'Hernia'):
-        df = self.ClassificationDf()
-        nofinding_df = df[df['No Finding'] == 1]
-        nofinding_df_len = nofinding_df.iloc[:sum(df[condition])]
-        condition_df = df[df[condition] == 1]
-        half_condition_df = pd.concat([nofinding_df_len, condition_df])
-        half_condition_df = half_condition_df[['Image Index', condition]]
-        half_condition_df = half_condition_df.sample(frac=1)
-        indexed_w_all = df.set_index('Image Index')
+    def SlowHalfConditionDf(self, condition = 'Hernia', small_sample = False):
+        if small_sample == False:
+            df = self.ClassificationDf()
+            nofinding_df = df[df['No Finding'] == 1]
+            nofinding_df_len = nofinding_df.iloc[:sum(df[condition])]
+            condition_df = df[df[condition] == 1]
+            half_condition_df = pd.concat([nofinding_df_len, condition_df])
+            half_condition_df = half_condition_df[['Image Index', condition]]
+            half_condition_df = half_condition_df.sample(frac=1)
+            indexed_w_all = df.set_index('Image Index')
 
-        training_data= []
-        for img_name in half_condition_df['Image Index']:
-            condition_pos = indexed_w_all.loc[img_name][condition]
-            img_array = imread(f'images/{img_name}', as_grey=True)
-            new_array = rescale(img_array, 1/3, mode='reflect')
-            hog_array, xray_hog_img = hog(
-                new_array, pixels_per_cell=(12, 12),
-                cells_per_block=(2,2),
-                orientations=8,
-                visualise=True,
-                block_norm='L2-Hys')
-            training_data.append([img_name, hog_array, condition_pos])
+            training_data= []
+            for img_name in half_condition_df['Image Index']:
+                condition_pos = indexed_w_all.loc[img_name][condition]
+                img_array = imread(f'images/{img_name}', as_grey=True)
+                new_array = rescale(img_array, 1/3, mode='reflect')
+                hog_array, xray_hog_img = hog(
+                    new_array, pixels_per_cell=(12, 12),
+                    cells_per_block=(2,2),
+                    orientations=8,
+                    visualise=True,
+                    block_norm='L2-Hys')
+                training_data.append([img_name, hog_array, condition_pos])
 
 
-        hog_df = pd.DataFrame(training_data)
-        hog_df = hog_df.rename(columns={0: "img_name", 
-                                        1: "hog_array", 
-                                        2: condition})
-        smol_df = hog_df.apply(pd.Series)
-        matrix_df = hog_df.hog_array.apply(pd.Series)
-        df_merged = pd.concat([smol_df, matrix_df], axis=1, sort=False)
-        df_merged = df_merged.drop('hog_array', axis = 1)
+            hog_df = pd.DataFrame(training_data)
+            hog_df = hog_df.rename(columns={0: "img_name", 
+                                            1: "hog_array", 
+                                            2: condition})
+            smol_df = hog_df.apply(pd.Series)
+            matrix_df = hog_df.hog_array.apply(pd.Series)
+            df_merged = pd.concat([smol_df, matrix_df], axis=1, sort=False)
+            df_merged = df_merged.drop('hog_array', axis = 1)
 
-        return df_merged
+            return df_merged
 
+        else:
+            df = self.ClassificationDf()
+            nofinding_df = df[df['No Finding'] == 1]
+            nofinding_df_len = nofinding_df.iloc[:small_sample]
+            condition_df = df[df[condition] == 1].iloc[:small_sample]
+            half_condition_df = pd.concat([nofinding_df_len, condition_df])
+            half_condition_df = half_condition_df[['Image Index', condition]]
+            half_condition_df = half_condition_df.sample(frac=1)
+            indexed_w_all = df.set_index('Image Index')
+
+            training_data= []
+            for img_name in half_condition_df['Image Index']:
+                condition_pos = indexed_w_all.loc[img_name][condition]
+                img_array = imread(f'images/{img_name}', as_grey=True)
+                new_array = rescale(img_array, 1/3, mode='reflect')
+                hog_array, xray_hog_img = hog(
+                    new_array, pixels_per_cell=(12, 12),
+                    cells_per_block=(2,2),
+                    orientations=8,
+                    visualise=True,
+                    block_norm='L2-Hys')
+                training_data.append([img_name, hog_array, condition_pos])
+
+
+            hog_df = pd.DataFrame(training_data)
+            hog_df = hog_df.rename(columns={0: "img_name", 
+                                            1: "hog_array", 
+                                            2: condition})
+            smol_df = hog_df.apply(pd.Series)
+            matrix_df = hog_df.hog_array.apply(pd.Series)
+            df_merged = pd.concat([smol_df, matrix_df], axis=1, sort=False)
+            df_merged = df_merged.drop('hog_array', axis = 1)
+
+            return df_merged
+
+    def HalfConditionDf(self, condition = 'Hernia', small_sample = False):
+        
+        if small_sample == False:
+            df = self.ClassificationDf()
+            nofinding_df = df[df['No Finding'] == 1]
+            nofinding_df_len = nofinding_df.iloc[:sum(df[condition])]
+            condition_df = df[df[condition] == 1]
+            half_condition_df = pd.concat([nofinding_df_len, condition_df])
+            half_condition_df = half_condition_df[['Image Index', condition]]
+            half_condition_df = half_condition_df.sample(frac=1)
+            indexed_w_all = df.set_index('Image Index')
+            training_data= []
+            for img_name in half_condition_df['Image Index']:
+                condition_pos = indexed_w_all.loc[img_name][condition]
+                img_array = imread(f'images/{img_name}', as_grey=True)
+                new_array = rescale(img_array, 1/3, mode='reflect')
+                hog_array = hog(
+                                new_array, pixels_per_cell=(12, 12),
+                                cells_per_block=(2,2),
+                                orientations=8,
+                                visualise=False,
+                                block_norm='L2-Hys')
+                training_data.append([img_name, hog_array, condition_pos])
+            hog_df = pd.DataFrame(training_data)
+            hog_df = hog_df.rename(columns={0: "img_name", 
+                                            1: "hog_array", 
+                                            2: condition})
+            smol_df = hog_df.apply(pd.Series)
+            matrix_df = hog_df.hog_array.apply(pd.Series)
+            df_merged = pd.concat([smol_df, matrix_df], axis=1, sort=False)
+            df_merged = df_merged.drop('hog_array', axis = 1)
+            return df_merged
+        
+        else:
+            df = self.ClassificationDf()
+            nofinding_df = df[df['No Finding'] == 1]
+            nofinding_df_len = nofinding_df.iloc[:small_sample]
+            condition_df = df[df[condition] == 1].iloc[:small_sample]
+            half_condition_df = pd.concat([nofinding_df_len, condition_df])
+            half_condition_df = half_condition_df[['Image Index', condition]]
+            half_condition_df = half_condition_df.sample(frac=1)
+            indexed_w_all = df.set_index('Image Index')
+            training_data= []
+            for img_name in half_condition_df['Image Index']:
+                condition_pos = indexed_w_all.loc[img_name][condition]
+                img_array = imread(f'images/{img_name}', as_grey=True)
+                new_array = rescale(img_array, 1/3, mode='reflect')
+                hog_array= hog(
+                    new_array, pixels_per_cell=(12, 12),
+                    cells_per_block=(2,2),
+                    orientations=8,
+                    visualise=False,
+                    block_norm='L2-Hys')
+                training_data.append([img_name, hog_array, condition_pos])
+            hog_df = pd.DataFrame(training_data)
+            hog_df = hog_df.rename(columns={0: "img_name", 
+                                            1: "hog_array", 
+                                            2: condition})
+            smol_df = hog_df.apply(pd.Series)
+            matrix_df = hog_df.hog_array.apply(pd.Series)
+            df_merged = pd.concat([smol_df, matrix_df], axis=1, sort=False)
+            df_merged = df_merged.drop('hog_array', axis = 1)
+            return df_merged
 
     def HalfConditionDf_(self, condition = 'Hernia'):
         df = self.ClassificationDf()
@@ -81,7 +180,12 @@ class Rads_Reader:
             condition_pos = indexed_w_all.loc[img_name][condition]
             img_array = imread(f'images/{img_name}', as_grey=True)
             new_array = rescale(img_array, 1/3, mode='reflect')
-            hog_array = hog(new_array)
+            hog_array = hog(
+                            new_array, pixels_per_cell=(12, 12),
+                            cells_per_block=(2,2),
+                            orientations=8,
+                            visualise=False,
+                            block_norm='L2-Hys')
             training_data.append([img_name, hog_array, condition_pos])
 
 
