@@ -2,7 +2,7 @@
 
 This project is designed to give patients a "second opinion" of their chest X-ray. This is accomplished by training a Convolutional Naural Network Sequential model on 112K labled images of chest X-rays and hosting the model on the internet for free and open access.
 
-|![Chest Comparison](img/chest_comparison.png)|
+![Chest Comparison](img/chest_comparison.png)
 
 ## Getting Started
 
