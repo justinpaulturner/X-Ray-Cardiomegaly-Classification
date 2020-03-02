@@ -49,6 +49,61 @@ class Rads_Reader:
         X_half_selection = X[[training_df.index]]
         return X_half_selection
     
+    def SplitTrainingData(self):
+        X_train, X_test, y_train, y_test = train_test_split(self.X(), self.y(), test_size=0.1, random_state=0)
+        return X_train, X_test, y_train, y_test
+    
+    def BuildModel(self):
+        model = Sequential()
+        model.add(Conv2D(16, (3,3), activation='relu', input_shape = X_train[0].shape))
+        model.add(BatchNormalization())
+        model.add(MaxPool2D(2,2))
+        model.add(Dropout(0.3))
+
+        model.add(Conv2D(32, (3,3), activation='relu'))
+        model.add(BatchNormalization())
+        model.add(MaxPool2D(2,2))
+        model.add(Dropout(0.3))
+
+        model.add(Conv2D(64, (3,3), activation='relu'))
+        model.add(BatchNormalization())
+        model.add(MaxPool2D(2,2))
+        model.add(Dropout(0.4))
+
+        model.add(Conv2D(128, (3,3), activation='relu'))
+        model.add(BatchNormalization())
+        model.add(MaxPool2D(2,2))
+        model.add(Dropout(0.5))
+
+        model.add(Flatten())
+
+        model.add(Dense(128, activation='relu'))
+        model.add(BatchNormalization())
+        model.add(Dropout(0.5))
+
+
+        model.add(Dense(128, activation='relu'))
+        model.add(BatchNormalization())
+        model.add(Dropout(0.5))
+
+        model.add(Dense(2, activation='softmax'))
+        
+        METRICS = [
+              tf.keras.metrics.TruePositives(name='tp'),
+              tf.keras.metrics.FalsePositives(name='fp'),
+              tf.keras.metrics.TrueNegatives(name='tn'),
+              tf.keras.metrics.FalseNegatives(name='fn'),
+              tf.keras.metrics.BinaryAccuracy(name='accuracy'),
+              tf.keras.metrics.Precision(name='precision'),
+              tf.keras.metrics.Recall(name='recall'),
+              tf.keras.metrics.AUC(name='auc')
+        ]
+        model.compile(optimizer='adam', loss = 'binary_crossentropy', metrics=METRICS)
+        return model
+
+        
+        
+    
     
         
         
