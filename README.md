@@ -43,6 +43,12 @@ A secuential convolutional neural network was compiled. The model consisted of 8
 After only 8 epochs a recall of .75 was achieved. 
 ![Recall](img/cnn_recall.png)
 
+### Conclusion and Next Steps
+
+I am currently working on an open website that enables users to upload pictures of their chest x-rays for the model to classify. 
+
+Explore training additional CNN models on the other diseases in the dataset. 
+
 
 
 
