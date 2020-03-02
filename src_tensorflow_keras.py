@@ -11,19 +11,8 @@ All images: https://rads-reader-images.s3.us-east-2.amazonaws.com/all_images/
 # Author: Justin Paul Turner <justin@justinpturner.com>
 # License: BSD 3 clause
 # Class for handing the chest X-ray data
-# Designed to access data that is stored locally on the ec2 machine
+# Designed to access data that is stored in a publicly available Amazon s3 bucket so that anyone can import and use the Rads_Reader class
 
-#TODO: 
-    #Currently have a massive training array with mathcing indexes to the condition dataframe.
-    #Need to select only the rows from that array to train the model on.
-    #Current code creates the dataframe I need but does not have the training data...
-    #Going to try to index the numpy array based on the index
-    #Need to verify that the indexing I did reorders the training data to match the 
-    #Verified! Great work!
-    #Need to train model and add it to this doc while the model trains
-    #Need to load the X data onto the s3 so that the class can be called on any computer
-    #Model trained
-    #Need to test model
     
 
 import numpy as np
