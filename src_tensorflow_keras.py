@@ -100,6 +100,10 @@ class Rads_Reader:
         ]
         model.compile(optimizer='adam', loss = 'binary_crossentropy', metrics=METRICS)
         return model
+    
+    
+    
+    
 
         
         
